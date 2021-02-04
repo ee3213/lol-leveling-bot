@@ -4,8 +4,9 @@
 #            ends, and then repeat.                                                     #
 
 import listener
+import utilities
 import gui
 
 if __name__ == '__main__':
-    listener.create_thread()
-    print("This program now uses a CLI!")
+    #listener.create_thread()
+    utilities.save_user_files()

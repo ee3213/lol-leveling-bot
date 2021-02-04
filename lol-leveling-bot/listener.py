@@ -10,7 +10,6 @@ import win32con
 import time
 
 import globals
-import utilities
 
 listener_thread_id = None  # used for terminating the thread properly
 
@@ -22,7 +21,6 @@ def on_keyboard_event(event):
             globals.go_flag = 1
         else:
             globals.go_flag = 0
-    utilities.reset_labels()
     # return True to pass the event to other handlers
     return True
 

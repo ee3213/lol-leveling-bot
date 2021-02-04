@@ -12,16 +12,19 @@ stop_flag = 0
 time_since_last_click = 0
 game_flag = 0  # used in robot.click_mid() to test if game is finished
 
+# File variables
+files_to_replace = ['game.cfg', 'input.ini']
+
 # Thread variables
 listener_thread = None
-gui_thread = None
+# gui_thread = None
 bot_thread = None
 
 # GUI variables
-last_status = None
-status_label = None
-games_played_label = None
-games_left_label = None
-pause_button = None
-settings_pause_key = None
-settings_num_games = None
+# last_status = None
+# status_label = None
+# games_played_label = None
+# games_left_label = None
+# pause_button = None
+# settings_pause_key = None
+# settings_num_games = None

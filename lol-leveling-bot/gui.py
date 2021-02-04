@@ -1,3 +1,6 @@
+#   @author: Mitchell Levesque                                                          #
+#   @desc  : A file containing all code for building the user interfaces.               #
+
 import sys
 import tkinter as tk
 import tkinter.simpledialog

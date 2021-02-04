@@ -1,3 +1,6 @@
+#   @author: Mitchell Levesque                                                          #
+#   @desc  : A file that listens for global key presses to handle pausing hotkeys       #
+
 import threading
 
 import pyWinhook

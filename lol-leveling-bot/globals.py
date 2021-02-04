@@ -10,7 +10,7 @@ number_of_games_finished = 0
 go_flag = 1
 stop_flag = 0
 time_since_last_click = 0
-game_flag = 0  # used in robot.clickMid() to test if game is finished
+game_flag = 0  # used in robot.click_mid() to test if game is finished
 
 # Thread variables
 listener_thread = None

@@ -8,4 +8,4 @@ import gui
 
 if __name__ == '__main__':
     listener.create_thread()
-    gui.build()
+    print("This program now uses a CLI!")

@@ -10,6 +10,7 @@ import win32con
 import time
 
 import globals
+import utilities
 
 listener_thread_id = None  # used for terminating the thread properly
 
@@ -18,14 +19,10 @@ listener_thread_id = None  # used for terminating the thread properly
 def on_keyboard_event(event):
     if event.Key == globals.pause_key:
         if globals.go_flag == 0:
-            globals.status_label.config(text=globals.last_status)
-            globals.pause_button.config(text="Pause (F6)")
             globals.go_flag = 1
         else:
-            globals.last_status = globals.status_label.cget("text")
-            globals.status_label.config(text="Bot paused!")
-            globals.pause_button.config(text="Unpause (F6)")
             globals.go_flag = 0
+    utilities.reset_labels()
     # return True to pass the event to other handlers
     return True
 

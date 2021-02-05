@@ -12,23 +12,30 @@ import globals
 import utilities
 import pictures
 import regions
+import listener
 
 import psutil
 import pyautogui
 import win32api
 import win32con
 import win32gui
+import os
 
 # Global variables
 listOfChampions = [pictures.ashe, pictures.annie]
-client_path = 'C:\\Riot Games\\League of Legends\\LeagueClient.exe'
-picture_path = "C:\\Users\\tplev\\PycharmProjects\\lol-leveling-bot-old\\search_images\\"
+
+
+def start():
+    globals.number_of_games_to_play = int(input("How many games do you want to play? "))
+    utilities.setup()
+    listener.create_thread()
+    run()
 
 
 def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.90):
     if not globals.go_flag:
         return False
-    picture = picture_path + picture
+    picture = os.path.join(globals.picture_path, picture)
     try:
         if is_game:
             rect = utilities.get_game_coords()
@@ -58,9 +65,7 @@ def run():
         time.sleep(0.1)
     if globals.number_of_games_to_play is None:
         return
-    print('Current status: Starting bot...')
-    utilities.save_user_files()
-    utilities.set_bot_files()
+    print('Starting bot...')
     # If league is in game
     if utilities.is_league_in_game():
         if globals.stop_flag:
@@ -72,10 +77,10 @@ def run():
         if globals.stop_flag:
             return
         restart_client()
-        print('Current status: Awaiting login...')
+        print('Awaiting login...')
         await_login()
     globals.time_since_last_click = timer()
-    print('Current status: Queueing for a game...')
+    print('Queueing for a game...')
     while True:
         if globals.stop_flag:
             return
@@ -105,9 +110,8 @@ def run():
         attempt_to_click_on(pictures.accept, None)
         if lock_in_champion():
             print("Current status: In champion select...")
-            # TODO: make way for bot to tell it's still in champ select
-            # while attempt_to_click_on(champ_locked_coords, champ_locked_color, click=False):
-            #    time.sleep(1)
+            while attempt_to_click_on(pictures.intermediate_bots, None, click=False):
+                time.sleep(1)
         attempt_to_click_on(pictures.play_again, None)
         attempt_to_click_on(pictures.find_match, None)
 
@@ -124,21 +128,19 @@ def did_timeout(seconds):
 
 
 def lock_in_champion():
-    pass
-    # TODO: Add check to see if client is in champ select
-    # if not attempt_to_click_on(pictures., champ_select_color, click=False):
-    #    return False
-    # for champion in listOfChampions:
-    #     if scan_for_champ():
-    #         if attempt_to_click_on(pictures.lockin, None):
-    #             return True
-    #         else:
-    #             return False
-    # return False
+    if not attempt_to_click_on(pictures.intermediate_bots, None, click=False):
+        return False
+    for champion in listOfChampions:
+        if attempt_to_click_on(champion, None):
+            if attempt_to_click_on(pictures.lockin, None):
+                return True
+            else:
+                return False
+    return False
 
 
 def click_mid():
-    print('Current status: Waiting for game to start...')
+    print('Waiting for game to start...')
     # Wait until recall is visible, then we know we're in game
     while not attempt_to_click_on(pictures.recall, None, is_game=True, click=False):
         if globals.stop_flag:
@@ -151,7 +153,7 @@ def click_mid():
     lock_screen()
     # Test to see if the game just started, or if the bot started mid game (check trinket)
     if attempt_to_click_on(pictures.trinket, None, is_game=True, click=False):
-        print('Current status: Waiting for minions to spawn...')
+        print('Waiting for minions to spawn...')
         rect = utilities.get_game_coords()
         x = rect[0] + 1170
         y = rect[1] + 666
@@ -164,7 +166,7 @@ def click_mid():
                 return
             time.sleep(1)
     # Click mid
-    print('Current status: Running it down mid...')
+    print('Running it down mid...')
     globals.game_flag = 1
     while globals.game_flag:
         if globals.stop_flag:
@@ -200,8 +202,7 @@ def click_mid():
         if globals.number_of_games_finished == globals.number_of_games_to_play:
             print("The bot successfully finished %d out of %d games!" %
                   (globals.number_of_games_finished, globals.number_of_games_to_play))
-            globals.stop_flag = 1
-            # TODO: add stop() function here
+            quit_bot()
             return
         print("Currently queueing for a game...")
         globals.time_since_last_click = timer()
@@ -215,12 +216,12 @@ def click_mid():
 
 
 def client_stuck():
-    print('Current status: Program stuck.  Rebooting...')
+    print('Program stuck.  Rebooting...')
     restart_client()
-    print('Current status: Awaiting login...')
+    print('Awaiting login...')
     await_login()
     globals.time_since_last_click = timer()
-    print('Current status: Queueing for a game...')
+    print('Queueing for a game...')
 
 
 def await_login():
@@ -265,7 +266,7 @@ def open_client():
 
 def restart_client():
     if utilities.is_client_open():
-        print('Current status: Restarting client...')
+        print('Restarting client...')
         try:
             for proc in psutil.process_iter():
                 if proc.name() == "LeagueClient.exe":
@@ -278,7 +279,7 @@ def restart_client():
                 return
             time.sleep(1)
     else:
-        print('Current status: Starting client...')
+        print('Starting client...')
     open_client()
     for i in range(5):
         if globals.stop_flag:
@@ -331,3 +332,17 @@ def focus_game_or_client():
     #     SetForegroundWindow(find_window(title='League of Legends (TM) Client'))
     # elif(IsClientOpen()):
     #     SetForegroundWindow(find_window(title='League of Legends'))
+
+
+def pause():
+    if globals.go_flag == 0:
+        globals.go_flag = 1
+        print("Bot paused.")
+    else:
+        globals.go_flag = 0
+        print(globals.last_status)
+
+
+def quit_bot():
+    listener.stop()
+    globals.stop_flag = 1

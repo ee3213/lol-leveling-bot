@@ -5,12 +5,9 @@
 
 import os
 
-import listener
-import utilities
-import gui
+import robot
 
 
 if __name__ == '__main__':
-    utilities.setup()
-    # listener.create_thread()
-    #utilities.find_league_location()
+    robot.start()
+

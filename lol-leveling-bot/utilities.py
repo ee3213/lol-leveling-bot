@@ -11,10 +11,10 @@ lol_settings_path = "C:\\Riot Games\\League of Legends\\Config"
 
 
 def setup():
+    globals.picture_path = os.path.join(os.getcwd(), "search_images")
     find_league_location()
     save_user_files()
     set_bot_files()
-    set_user_files()
 
 
 def find_league_location():
@@ -103,3 +103,7 @@ def is_riot_client_open():
     except Exception:
         return False
 
+
+def set_status(status):
+    globals.last_status = status
+    print(status)

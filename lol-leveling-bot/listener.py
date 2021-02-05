@@ -10,24 +10,17 @@ import win32con
 import time
 
 import globals
+import robot
 
-listener_thread_id = None  # used for terminating the thread properly
 
-
-# TODO make Pause() function for bot class
 def on_keyboard_event(event):
     if event.Key == globals.pause_key:
-        if globals.go_flag == 0:
-            globals.go_flag = 1
-        else:
-            globals.go_flag = 0
+        robot.pause()
     # return True to pass the event to other handlers
     return True
 
 
 def hook_keyboard():
-    global listener_thread_id
-
     # wait until the gui thread gets an input
     while globals.number_of_games_to_play == -1:
         time.sleep(0.1)
@@ -36,7 +29,7 @@ def hook_keyboard():
         return
 
     # save the id of the thread
-    listener_thread_id = threading.get_ident()
+    globals.listener_thread_id = threading.get_ident()
 
     # create a hook manager
     hm = pyWinhook.HookManager()
@@ -54,5 +47,5 @@ def create_thread():
 
 
 def stop():
-    if listener_thread_id is not None:
-        win32api.PostThreadMessage(listener_thread_id, win32con.WM_QUIT, 0, 0)
+    if globals.listener_thread_id is not None:
+        win32api.PostThreadMessage(globals.listener_thread_id, win32con.WM_QUIT, 0, 0)

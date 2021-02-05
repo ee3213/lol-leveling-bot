@@ -15,7 +15,7 @@ import robot
 
 def on_keyboard_event(event):
     if event.Key == globals.pause_key:
-        robot.pause()
+        robot.set_to_pause()
     # return True to pass the event to other handlers
     return True
 

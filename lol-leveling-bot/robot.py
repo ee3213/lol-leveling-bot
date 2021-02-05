@@ -77,7 +77,7 @@ def run():
     # If league is in game, finish the game
     if utilities.is_league_in_game():
         focus_game_or_client()
-        click_mid()
+        complete_game()
 
     # Otherwise, restart client and wait for login
     else:
@@ -93,7 +93,7 @@ def run():
 
         # If we are in game, simply execute the click_mid() function
         if utilities.is_league_in_game():
-            click_mid()
+            complete_game()
             continue
 
         # Check for daily play rewards
@@ -142,8 +142,9 @@ def lock_in_champion():
     return False
 
 
-def click_mid():
+def complete_game():
     utilities.set_status('Waiting for game to start...')
+
     # Wait until recall is visible, then we know we're in game
     while not attempt_to_click_on(pictures.recall, None, is_game=True, click=False):
         pause_if_needed()

@@ -346,3 +346,4 @@ def pause():
 def quit_bot():
     listener.stop()
     globals.stop_flag = 1
+    utilities.set_user_files()

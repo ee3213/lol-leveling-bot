@@ -13,6 +13,7 @@ time_since_last_click = 0
 game_flag = 0  # used in robot.click_mid() to test if game is finished
 
 # File variables
+lol_client_path = None
 files_to_replace = ['game.cfg', 'input.ini']
 
 # Thread variables

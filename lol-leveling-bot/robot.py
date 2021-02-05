@@ -11,8 +11,8 @@ from timeit import default_timer as timer
 import globals
 import utilities
 import pictures
+import regions
 
-import PIL.ImageGrab
 import psutil
 import pyautogui
 import win32api
@@ -25,13 +25,15 @@ client_path = 'C:\\Riot Games\\League of Legends\\LeagueClient.exe'
 picture_path = "C:\\Users\\tplev\\PycharmProjects\\lol-leveling-bot-old\\search_images\\"
 
 
-def attempt_to_click_on(picture, region, is_game=False, click=True, conf=0.90):
+def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.90):
     if not globals.go_flag:
         return False
     picture = picture_path + picture
     try:
         if is_game:
             rect = utilities.get_game_coords()
+        elif is_riot_client:
+            rect = utilities.get_riot_client_coords()
         else:
             rect = utilities.get_client_coords()
         if region is not None:
@@ -71,7 +73,6 @@ def run():
             return
         restart_client()
         print('Current status: Awaiting login...')
-        client_open = False
         await_login()
     globals.time_since_last_click = timer()
     print('Current status: Queueing for a game...')
@@ -83,92 +84,75 @@ def run():
             time.sleep(1)
             globals.time_since_last_click = timer()
             continue
-        # If we are in game, simply execute the ClickMid() function
+        # If we are in game, simply execute the click_mid() function
         if utilities.is_league_in_game():
             click_mid()
             continue
         # Check for daily play rewards
-        if attempt_to_click_on(pictures.daily_play, daily_play_color):
+        if attempt_to_click_on(pictures.daily_play, None):
             daily_play()
         # Check for level up rewards
-        attempt_to_click_on(ok_levelup_coords, ok_levelup_color)
+        attempt_to_click_on(pictures.ok, None)
 
         # Check for buttons
-        AttemptToClickOnPix(play_coords, play_party_color)
-        AttemptToClickOnPix(party_coords, play_party_color)
-        AttemptToClickOnPix(coop_vs_ai_coords, coop_vs_ai_color)
-        AttemptToClickOnPix(find_match_coords, find_match_color)
-        AttemptToClickOnPix(intermediate_coords, intermediate_color)
-        AttemptToClickOnPix(confirm_coords, confirm_color)
-        AttemptToClickOnPix(find_match_coords, find_match_color)
-        AttemptToClickOnPix(accept_coords, accept_color)
-        if (LockInChampion()):
-            SetStatus("Current status: In champion select...")
-            while (AttemptToClickOnPix(champ_locked_coords, champ_locked_color, click=False)):
-                time.sleep(1)
-        AttemptToClickOnPix(play_again_coords, play_again_color)
-        AttemptToClickOnPix(find_match_coords, find_match_color)
+        attempt_to_click_on(pictures.play_button, None)
+        attempt_to_click_on(pictures.party, None)
+        attempt_to_click_on(pictures.coop_vs_ai, None)
+        attempt_to_click_on(pictures.find_match, None)
+        attempt_to_click_on(pictures.intermediate_bots, None)
+        attempt_to_click_on(pictures.confirm, None)
+        attempt_to_click_on(pictures.find_match, None)
+        attempt_to_click_on(pictures.accept, None)
+        if lock_in_champion():
+            print("Current status: In champion select...")
+            # TODO: make way for bot to tell it's still in champ select
+            # while attempt_to_click_on(champ_locked_coords, champ_locked_color, click=False):
+            #    time.sleep(1)
+        attempt_to_click_on(pictures.play_again, None)
+        attempt_to_click_on(pictures.find_match, None)
 
         # If 2 minutes has elapsed without doing anything, restart client
-        if (DidTimeout(120)):
-            ClientStuck()
+        if did_timeout(120):
+            client_stuck()
 
 
 def did_timeout(seconds):
-    global timeSinceLastClick
-    if (timer() - timeSinceLastClick > seconds):
+    if timer() - globals.time_since_last_click > seconds:
         return True
     else:
         return False
 
 
 def lock_in_champion():
-    global listOfChampions
-    if (not AttemptToClickOnPix(champ_select_coords, champ_select_color, click=False)):
-        return False
-    for champion in listOfChampions:
-        if (ScanForChamp(champion)):
-            if (AttemptToClickOnPix(lock_in_coords, lock_in_color)):
-                return True
-            else:
-                return False
-    return False
-
-
-def scan_for_champ(champColor):
-    try:
-        rect = GetClientCoords()
-        img = PIL.ImageGrab.grab(bbox=rect)
-        for x in range(champ_select_left[0], champ_select_right[0]):
-            for y in range(champ_select_left[1], champ_select_right[1]):
-                pix = img.getpixel((x, y))
-                if (pix == champColor):
-                    xCoord = rect[0] + x
-                    yCoord = rect[1] + y
-                    pyautogui.click(x=xCoord, y=yCoord)
-                    time.sleep(0.5)
-                    return True
-    except Exception:
-        return False
+    pass
+    # TODO: Add check to see if client is in champ select
+    # if not attempt_to_click_on(pictures., champ_select_color, click=False):
+    #    return False
+    # for champion in listOfChampions:
+    #     if scan_for_champ():
+    #         if attempt_to_click_on(pictures.lockin, None):
+    #             return True
+    #         else:
+    #             return False
+    # return False
 
 
 def click_mid():
-    global goFlag, stopFlag, numberOfGamesFinished, gameFlag, lbl1, lbl2, lbl3, timeSinceLastClick
-    SetStatus('Current status: Waiting for game to start...')
+    print('Current status: Waiting for game to start...')
     # Wait until recall is visible, then we know we're in game
-    while (not AttemptToClickOnPix(game_recall_coords, game_recall_color, isGame=True, click=False)):
-        if (stopFlag):
+    while not attempt_to_click_on(pictures.recall, None, is_game=True, click=False):
+        if globals.stop_flag:
             return
-        if (not goFlag):
+        if not globals.go_flag:
             time.sleep(1)
             continue
         time.sleep(1)
     # Lock the screen once we're in game
-    LockScreen()
+    lock_screen()
     # Test to see if the game just started, or if the bot started mid game (check trinket)
-    if (AttemptToClickOnPix(game_trinket_coords, game_trinket_color, isGame=True, click=False)):
-        SetStatus('Current status: Waiting for minions to spawn...')
-        rect = GetGameCoords()
+    if attempt_to_click_on(pictures.trinket, None, is_game=True, click=False):
+        print('Current status: Waiting for minions to spawn...')
+        rect = utilities.get_game_coords()
         x = rect[0] + 1170
         y = rect[1] + 666
         win32api.SetCursorPos((x, y))
@@ -176,35 +160,33 @@ def click_mid():
         win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
         win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, x, y, 0, 0)
         for i in range(70):
-            if (stopFlag):
+            if globals.stop_flag:
                 return
             time.sleep(1)
     # Click mid
-    SetStatus('Current status: Running it down mid...')
-    gameFlag = 1
-    while (gameFlag):
-        if (stopFlag):
+    print('Current status: Running it down mid...')
+    globals.game_flag = 1
+    while globals.game_flag:
+        if globals.stop_flag:
             return
-        if (not goFlag):
+        if not globals.go_flag:
             time.sleep(1)
             continue
         # If we're out of game
-        if (not IsLeagueInGame()):
-            gameFlag = 0
+        if not utilities.is_league_in_game():
+            globals.game_flag = 0
             continue
         try:
-            rect = GetGameCoords()
-        except Exception as e:
+            rect = utilities.get_game_coords()
+        except Exception:
             time.sleep(3)
             continue
         x = rect[0] + 1260
         y = rect[1] + 592
         # Right click down mid
         for i in range(5):
-            if (not goFlag):
+            if not globals.go_flag:
                 continue
-            # if(AttemptToClickOnPix(game_health_coords, game_health_color, isGame=True, click=False)):
-            # FallBack()
             try:
                 win32api.SetCursorPos((x, y))
                 win32api.mouse_event(win32con.MOUSEEVENTF_MIDDLEDOWN, x, y, 0, 0)
@@ -213,81 +195,77 @@ def click_mid():
             except Exception:
                 time.sleep(3)
                 continue
-    if (not stopFlag):
-        IncrementGames()
-        if (numberOfGamesFinished == numberOfGamesToPlay):
-            SetStatus(
-                "The bot successfully finished %d out of %d games!" % (numberOfGamesFinished, numberOfGamesToPlay))
-            lbl3.config(text="")
-            lbl2.config(text="")
-            stopFlag = 1
-            win32api.PostThreadMessage(th2_id, win32con.WM_QUIT, 0, 0)
+    if not globals.stop_flag:
+        increment_games()
+        if globals.number_of_games_finished == globals.number_of_games_to_play:
+            print("The bot successfully finished %d out of %d games!" %
+                  (globals.number_of_games_finished, globals.number_of_games_to_play))
+            globals.stop_flag = 1
+            # TODO: add stop() function here
             return
-        SetStatus("Currently queueing for a game...")
-        timeSinceLastClick = timer()
-        while (not AttemptToClickOnPix(skip_honor_coords, skip_honor_color)):
-            if (stopFlag):
+        print("Currently queueing for a game...")
+        globals.time_since_last_click = timer()
+        while not attempt_to_click_on(pictures.skip_honor, None):
+            if globals.stop_flag:
                 return
-            if (DidTimeout(30)):
-                ClientStuck()
+            if did_timeout(30):
+                client_stuck()
                 return
             time.sleep(1)
 
 
 def client_stuck():
-    global timeSinceLastClick, goFlag, stopFlag
-    SetStatus('Current status: Program stuck.  Rebooting...')
-    RestartClient()
-    SetStatus('Current status: Awaiting login...')
-    AwaitLogin()
-    timeSinceLastClick = timer()
-    SetStatus('Current status: Queueing for a game...')
+    print('Current status: Program stuck.  Rebooting...')
+    restart_client()
+    print('Current status: Awaiting login...')
+    await_login()
+    globals.time_since_last_click = timer()
+    print('Current status: Queueing for a game...')
 
 
 def await_login():
-    while (True):
-        if (stopFlag):
+    while True:
+        if globals.stop_flag:
             return
-        elif (not goFlag):
+        elif not globals.go_flag:
             time.sleep(1)
             continue
-        elif (AttemptToClickOnPix(play_coords, play_party_color)):
+        elif attempt_to_click_on(pictures.play_button, None):
             return
-        elif (AttemptToClickOnPix(party_coords, play_party_color)):
+        elif attempt_to_click_on(pictures.party, None):
             return
-        elif (AttemptToClickOnPix(daily_play_coords, daily_play_color)):
-            DailyPlay()
+        elif attempt_to_click_on(pictures.daily_play, None):
+            daily_play()
             return
-        elif (AttemptToClickOnPix(riot_client_play_coords, riot_client_play_color, isRiotClient=True)):
+        elif attempt_to_click_on(pictures.riot_client_play, None, is_riot_client=True):
             pass
 
 
 def lock_screen():
     try:
-        rect = GetGameCoords()
-        x, y = game_lockscreen_coords
+        rect = utilities.get_game_coords()
+        x, y = regions.game_lockscreen_coords
         x = rect[0] + x
         y = rect[1] + y
         win32api.SetCursorPos((x, y))
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
         time.sleep(0.1)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
-    except:
+    except Exception:
         pass
 
 
 def open_client():
-    global clientPath
     try:
-        subprocess.Popen(clientPath)
+        subprocess.Popen(globals.lol_client_path)
     except Exception as e:
         print(e)
         sys.exit()
 
 
 def restart_client():
-    if (IsClientOpen()):
-        SetStatus('Current status: Restarting client...')
+    if utilities.is_client_open():
+        print('Current status: Restarting client...')
         try:
             for proc in psutil.process_iter():
                 if proc.name() == "LeagueClient.exe":
@@ -295,53 +273,56 @@ def restart_client():
                     break
         except Exception as e:
             print(e)
-        while (IsClientOpen()):
-            if (stopFlag):
+        while utilities.is_client_open():
+            if globals.stop_flag:
                 return
             time.sleep(1)
     else:
-        SetStatus('Current status: Starting client...')
-    OpenClient()
+        print('Current status: Starting client...')
+    open_client()
     for i in range(5):
-        if (stopFlag):
+        if globals.stop_flag:
             return
         time.sleep(1)
 
 
 def daily_play():
     done = False
-    start = timer()
     while not done:
-        if stopFlag:
+        if globals.stop_flag:
             return
-        if not goFlag:
-            timeSinceLastClick = timer()
+        if not globals.go_flag:
+            globals.time_since_last_click = timer()
             time.sleep(1)
             continue
         # If we don't find anything within 30 seconds, the client is probably stuck
-        if DidTimeout(30):
-            ClientStuck()
-        AttemptToClickOn('dailyplay_caitlyn.png', None)
-        AttemptToClickOn('dailyplay_illaoi.png', None)
-        AttemptToClickOn('dailyplay_ziggs.png', None)
-        if (AttemptToClickOnPix(daily_play_thresh_coords, daily_play_thresh_color)):
-            AttemptToClickOnPix(daily_play_middle_select_coords, daily_play_middle_select_color)
-        AttemptToClickOn('dailyplay_ekko.png', None)
-        AttemptToClickOn('select_daily.png', LOWER_HALF_RECT)
-        done = AttemptToClickOnPix(daily_play_ok_coords, daily_play_ok_color)
+        if did_timeout(30):
+            client_stuck()
+        attempt_to_click_on(pictures.daily_play_caitlyn, None)
+        attempt_to_click_on(pictures.daily_play_illaoi, None)
+        attempt_to_click_on(pictures.daily_play_ziggs, None)
+        attempt_to_click_on(pictures.daily_play_thresh, None)
+        attempt_to_click_on(pictures.daily_play_ekko, None)
+        attempt_to_click_on(pictures.select_daily, None)
+        done = attempt_to_click_on(pictures.ok_daily, None)
     return
 
 
 def move_windows():
     try:
-        if IsClientOpen():
+        if utilities.is_client_open():
             hwnd = win32gui.FindWindow(None, 'League of Legends')
             win32gui.MoveWindow(hwnd, 350, 180, 1280, 720, True)
-        if IsLeagueInGame():
+        if utilities.is_league_in_game():
             hwnd = win32gui.FindWindow(None, 'League of Legends (TM) Client')
             win32gui.MoveWindow(hwnd, 600, 180, 1280, 720, True)
-    except Exception as e:
+    except Exception:
         return
+
+
+def increment_games():
+    globals.number_of_games_finished = globals.number_of_games_finished + 1
+    # games_left = globals.number_of_games_to_play - globals.number_of_games_finished
 
 
 def focus_game_or_client():

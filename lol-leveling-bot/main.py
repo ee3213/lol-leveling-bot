@@ -3,10 +3,14 @@
 #            a player for intermediate bots, attack move on the enemy nexus until game  #
 #            ends, and then repeat.                                                     #
 
+import os
+
 import listener
 import utilities
 import gui
 
+
 if __name__ == '__main__':
-    #listener.create_thread()
-    utilities.save_user_files()
+    utilities.setup()
+    # listener.create_thread()
+    #utilities.find_league_location()

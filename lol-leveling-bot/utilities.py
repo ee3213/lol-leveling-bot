@@ -1,30 +1,65 @@
 import shutil
 import os
 import win32gui
-# from pywinauto.findwindows import find_window
+from pywinauto.findwindows import find_window
 
 import globals
 
+user_settings_path = os.path.join(os.getcwd(), "user_settings")
+bot_settings_path = os.path.join(os.getcwd(), "bot_settings")
+lol_settings_path = "C:\\Riot Games\\League of Legends\\Config"
+
+
+def setup():
+    find_league_location()
+    save_user_files()
+    set_bot_files()
+    set_user_files()
+
+
+def find_league_location():
+    global lol_settings_path
+    print("Attempting to locate League of Legends...")
+    for r, d, f in os.walk("C:\\"):
+        for files in f:
+            if files == "LeagueClient.exe":
+                print("Successfully found %s" % r)
+                globals.lol_client_path = os.path.join(r, files)
+                lol_settings_path = os.path.join(r, "Config")
+                return
+    for r, d, f in os.walk("D:\\"):
+        for files in f:
+            if files == "LeagueClient.exe":
+                print("Successfully found %s" % r)
+                globals.lol_client_path = os.path.join(r, files)
+                lol_settings_path = os.path.join(r, "Config")
+                return
+    print("Failed to locate League of Legends.")
+
 
 def save_user_files():
-    src = 'C:\\Riot Games\\League of Legends\\Config'
-    dst = '.\\user-settings'
+    global user_settings_path
+    try:
+        print("Attempting to create folder %s..." % user_settings_path)
+        os.mkdir(user_settings_path)
+        print("Successfully created %s" % user_settings_path)
+    except FileExistsError:
+        print("Folder %s already exists" % user_settings_path)
     for files in globals.files_to_replace:
-        shutil.copy(os.path.join(src, files), os.path.join(dst, files))
+        shutil.copy(os.path.join(lol_settings_path, files), os.path.join(user_settings_path, files))
+    print("Successfully saved user settings to %s" % user_settings_path)
 
 
 def set_bot_files():
-    src = '.\\bot-settings'
-    dst = 'C:\\Riot Games\\League of Legends\\Config'
     for files in globals.files_to_replace:
-        shutil.copy(os.path.join(src, files), os.path.join(dst, files))
+        shutil.copy(os.path.join(bot_settings_path, files), os.path.join(lol_settings_path, files))
+    print("Successfully loaded bot settings to %s" % lol_settings_path)
 
 
 def set_user_files():
-    src = '.\\user-settings'
-    dst = 'C:\\Riot Games\\League of Legends\\Config'
     for files in globals.files_to_replace:
-        shutil.copy(os.path.join(src, files), os.path.join(dst, files))
+        shutil.copy(os.path.join(user_settings_path, files), os.path.join(lol_settings_path, files))
+    print("Successfully loaded user settings to %s" % lol_settings_path)
 
 
 def get_client_coords():
@@ -68,7 +103,3 @@ def is_riot_client_open():
     except Exception:
         return False
 
-
-def increment_games():
-    globals.number_of_games_finished = globals.number_of_games_finished + 1
-    games_left = globals.number_of_games_to_play - globals.number_of_games_finished

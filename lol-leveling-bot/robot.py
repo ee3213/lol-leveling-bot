@@ -43,34 +43,6 @@ def start():
     run()
 
 
-def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.90):
-    if not globals.go_flag:
-        return False
-    picture = os.path.join(globals.picture_path, picture)
-    try:
-        if is_game:
-            rect = utilities.get_game_coords()
-        elif is_riot_client:
-            rect = utilities.get_riot_client_coords()
-        else:
-            rect = utilities.get_client_coords()
-        if region is not None:
-            start_x = rect[0] + region[0]
-            start_y = rect[1] + region[1]
-            width = region[2]
-            height = region[3]
-            rect = (start_x, start_y, width, height)
-        coordinates = pyautogui.locateCenterOnScreen(picture, region=rect, confidence=conf)
-        if coordinates is not None:
-            if click:
-                pyautogui.click(coordinates[0], coordinates[1])
-            time.sleep(0.5)
-            globals.time_since_last_click = timer()
-            return True
-    except Exception:
-        return False
-
-
 def run():
     utilities.set_status('Starting bot...')
 
@@ -122,24 +94,6 @@ def run():
         # If 2 minutes has elapsed without doing anything, restart client
         if did_timeout(120):
             client_stuck()
-
-
-def did_timeout(seconds):
-    if timer() - globals.time_since_last_click > seconds:
-        return True
-    else:
-        return False
-
-
-def lock_in_champion():
-    for champion in listOfChampions:
-        if attempt_to_click_on(champion, None):
-            time.sleep(2)
-            if attempt_to_click_on(pictures.lockin, None):
-                return True
-            else:
-                return False
-    return False
 
 
 def complete_game():
@@ -207,6 +161,52 @@ def complete_game():
             client_stuck()
             return
         time.sleep(1)
+
+
+def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.90):
+    if not globals.go_flag:
+        return False
+    picture = os.path.join(globals.picture_path, picture)
+    try:
+        if is_game:
+            rect = utilities.get_game_coords()
+        elif is_riot_client:
+            rect = utilities.get_riot_client_coords()
+        else:
+            rect = utilities.get_client_coords()
+        if region is not None:
+            start_x = rect[0] + region[0]
+            start_y = rect[1] + region[1]
+            width = region[2]
+            height = region[3]
+            rect = (start_x, start_y, width, height)
+        coordinates = pyautogui.locateCenterOnScreen(picture, region=rect, confidence=conf)
+        if coordinates is not None:
+            if click:
+                pyautogui.click(coordinates[0], coordinates[1])
+            time.sleep(0.5)
+            globals.time_since_last_click = timer()
+            return True
+    except Exception:
+        return False
+
+
+def did_timeout(seconds):
+    if timer() - globals.time_since_last_click > seconds:
+        return True
+    else:
+        return False
+
+
+def lock_in_champion():
+    for champion in listOfChampions:
+        if attempt_to_click_on(champion, None):
+            time.sleep(2)
+            if attempt_to_click_on(pictures.lockin, None):
+                return True
+            else:
+                return False
+    return False
 
 
 def client_stuck():

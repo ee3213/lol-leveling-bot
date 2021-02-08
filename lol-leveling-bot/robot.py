@@ -22,7 +22,7 @@ import win32gui
 import os
 
 # Global variables
-listOfChampions = [pictures.ashe, pictures.annie]
+list_of_champs = [pictures.ashe, pictures.annie]
 
 
 def start():
@@ -35,10 +35,13 @@ def start():
             break
         except ValueError:
             print("Invalid integer. The number must be in the range of 1-100.")
+
     # Perform setup
     utilities.setup()
+
     # Create listener thread
     listener.create_thread()
+
     # Run bot
     run()
 
@@ -60,10 +63,12 @@ def run():
     # Start queueing up
     globals.time_since_last_click = timer()
     utilities.set_status('Queueing for a game...')
+
+    # Start loop
     while True:
         pause_if_needed()
 
-        # If we are in game, simply execute the click_mid() function
+        # If game has started, complete the game
         if utilities.is_league_in_game():
             complete_game()
             continue
@@ -75,7 +80,13 @@ def run():
         # Check for level up rewards
         attempt_to_click_on(pictures.ok, None)
 
-        # Check for buttons
+        # Check if we're in champ select
+        if attempt_to_click_on(pictures.edit_runes, None, click=False):
+            champ_select()
+            while attempt_to_click_on(pictures.edit_runes, None, click=False):
+                time.sleep(1)
+
+        # Check for other buttons
         attempt_to_click_on(pictures.play_button, None)
         attempt_to_click_on(pictures.party, None)
         attempt_to_click_on(pictures.coop_vs_ai, None)
@@ -84,10 +95,6 @@ def run():
         attempt_to_click_on(pictures.confirm, None)
         attempt_to_click_on(pictures.find_match, None)
         attempt_to_click_on(pictures.accept, None)
-        if lock_in_champion():
-            utilities.set_status("Current status: In champion select...")
-            while attempt_to_click_on(pictures.intermediate_bots, None, click=False):
-                time.sleep(1)
         attempt_to_click_on(pictures.play_again, None)
         attempt_to_click_on(pictures.find_match, None)
 
@@ -106,55 +113,43 @@ def complete_game():
     # Lock the screen once we're in game
     lock_screen()
 
-    # Test to see if the game just started, or if the bot started mid game (check trinket)
-    if attempt_to_click_on(pictures.trinket, None, is_game=True, click=False):
-        utilities.set_status('Waiting for minions to spawn...')
-        rect = utilities.get_game_coords()
-        x = rect[0] + 1170
-        y = rect[1] + 666
-        win32api.SetCursorPos((x, y))
-        time.sleep(15)
-        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
-        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, x, y, 0, 0)
-        for i in range(70):
-            time.sleep(1)
-
     # Click mid
     utilities.set_status('Running it down mid...')
-    globals.game_flag = 1
-    while globals.game_flag:
+    game_flag = 1
+    while game_flag:
         pause_if_needed()
 
         # If we're out of game
         if not utilities.is_league_in_game():
-            globals.game_flag = 0
+            game_flag = 0
             continue
+
+        # Get the location of league window
         try:
             rect = utilities.get_game_coords()
         except Exception:
-            time.sleep(3)
             continue
         x = rect[0] + 1260
         y = rect[1] + 592
-        # Right click down mid
-        for i in range(5):
-            pause_if_needed()
-            try:
-                win32api.SetCursorPos((x, y))
-                win32api.mouse_event(win32con.MOUSEEVENTF_MIDDLEDOWN, x, y, 0, 0)
-                win32api.mouse_event(win32con.MOUSEEVENTF_MIDDLEUP, x, y, 0, 0)
-                time.sleep(1)
-            except Exception:
-                time.sleep(3)
-                continue
+
+        # Right click down mid every 1 second
+        try:
+            win32api.SetCursorPos((x, y))
+            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
+            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, x, y, 0, 0)
+            time.sleep(1)
+        except Exception:
+            continue
+
     # Once the game is finished
     increment_games()
+
+    # Check to see if the bot is finished all games
     if globals.number_of_games_finished == globals.number_of_games_to_play:
-        utilities.set_status("The bot successfully finished %d out of %d games!" %
-                             (globals.number_of_games_finished, globals.number_of_games_to_play))
         quit_bot()
         return
-    utilities.set_status("Currently queueing for a game...")
+
+    # Skip honor
     globals.time_since_last_click = timer()
     while not attempt_to_click_on(pictures.skip_honor, None):
         if did_timeout(30):
@@ -162,8 +157,11 @@ def complete_game():
             return
         time.sleep(1)
 
+    # Requeue for another game
+    utilities.set_status("Currently queueing for a game...")
 
-def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.90):
+
+def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.95):
     if not globals.go_flag:
         return False
     picture = os.path.join(globals.picture_path, picture)
@@ -184,7 +182,6 @@ def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, cl
         if coordinates is not None:
             if click:
                 pyautogui.click(coordinates[0], coordinates[1])
-            time.sleep(0.5)
             globals.time_since_last_click = timer()
             return True
     except Exception:
@@ -198,8 +195,9 @@ def did_timeout(seconds):
         return False
 
 
-def lock_in_champion():
-    for champion in listOfChampions:
+def champ_select():
+    utilities.set_status("In champion select...")
+    for champion in list_of_champs:
         if attempt_to_click_on(champion, None):
             time.sleep(2)
             if attempt_to_click_on(pictures.lockin, None):
@@ -210,7 +208,7 @@ def lock_in_champion():
 
 
 def client_stuck():
-    utilities.set_status('Program stuck.  Rebooting...')
+    utilities.set_status('Bot stuck.  Rebooting...')
     restart_client()
     utilities.set_status('Awaiting login...')
     await_login()
@@ -220,12 +218,8 @@ def client_stuck():
 
 def await_login():
     while True:
-        if globals.stop_flag:
-            return
-        elif not globals.go_flag:
-            time.sleep(1)
-            continue
-        elif attempt_to_click_on(pictures.play_button, None):
+        pause_if_needed()
+        if attempt_to_click_on(pictures.play_button, None):
             return
         elif attempt_to_click_on(pictures.party, None):
             return
@@ -317,7 +311,12 @@ def move_windows():
 
 def increment_games():
     globals.number_of_games_finished = globals.number_of_games_finished + 1
-    # games_left = globals.number_of_games_to_play - globals.number_of_games_finished
+    if globals.number_of_games_finished == globals.number_of_games_to_play:
+        utilities.set_status("The bot successfully finished %d out of %d games!" %
+                             (globals.number_of_games_finished, globals.number_of_games_to_play))
+    else:
+        utilities.set_status("The bot finished %d out of %d games." %
+                             (globals.number_of_games_finished, globals.number_of_games_to_play))
 
 
 def focus_game_or_client():

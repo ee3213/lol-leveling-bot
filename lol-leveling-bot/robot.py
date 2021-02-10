@@ -231,8 +231,6 @@ def lock_screen():
 def open_client():
     try:
         subprocess.Popen(globals.lol_client_path)
-        while not utilities.is_client_open():
-            time.sleep(1)
     except Exception as e:
         print("Couldn't open league client")
         stop_bot()

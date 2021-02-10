@@ -7,6 +7,7 @@ import subprocess
 import sys
 import time
 from timeit import default_timer as timer
+import atexit
 
 from pywinauto.findwindows import find_window
 
@@ -25,27 +26,6 @@ import os
 
 # Champion variables
 list_of_champs = [pictures.ashe, pictures.annie]
-
-
-def start():
-    # Ask the user how many games they want to play
-    while True:
-        try:
-            globals.number_of_games_to_play = int(input("How many games do you want to play? "))
-            if globals.number_of_games_to_play < 1 or globals.number_of_games_to_play > 100:
-                raise ValueError
-            break
-        except ValueError:
-            print("Invalid integer. The number must be in the range of 1-100.")
-
-    # Perform setup
-    utilities.setup()
-
-    # Create listener thread
-    listener.create_thread()
-
-    # Run bot
-    run()
 
 
 def run():
@@ -145,7 +125,7 @@ def complete_game():
 
     # Check to see if the bot is finished all games
     if globals.number_of_games_finished == globals.number_of_games_to_play:
-        quit_bot()
+        stop_bot()
         return
 
     # Skip honor
@@ -249,9 +229,11 @@ def lock_screen():
 def open_client():
     try:
         subprocess.Popen(globals.lol_client_path)
+        while not utilities.is_client_open():
+            time.sleep(1)
     except Exception as e:
         print("Couldn't open league client")
-        sys.exit()
+        stop_bot()
 
 
 def restart_client():
@@ -265,24 +247,16 @@ def restart_client():
         except Exception as e:
             print(e)
         while utilities.is_client_open():
-            if globals.stop_flag:
-                return
             time.sleep(1)
     else:
         utilities.set_status('Starting client...')
     open_client()
-    for i in range(5):
-        if globals.stop_flag:
-            return
-        time.sleep(1)
 
 
 def daily_play():
     print("Claiming daily play rewards...")
     done = False
     while not done:
-        if globals.stop_flag:
-            return
         if not globals.go_flag:
             globals.time_since_last_click = timer()
             time.sleep(1)
@@ -344,11 +318,9 @@ def pause_if_needed():
     globals.time_since_last_click = timer()
 
 
-def quit_bot():
+def stop_bot():
     listener.stop()
-    globals.stop_flag = 1
     utilities.set_user_files()
-    print("Bot has finished all games.")
-    print("Bot will now quit.")
+    print("Bot has terminated.")
     while True:
         time.sleep(3)

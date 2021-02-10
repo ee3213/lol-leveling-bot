@@ -4,10 +4,8 @@
 #            ends, and then repeat.                                                     #
 
 import subprocess
-import sys
 import time
 from timeit import default_timer as timer
-import atexit
 
 from pywinauto.findwindows import find_window
 

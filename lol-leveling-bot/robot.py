@@ -8,6 +8,8 @@ import sys
 import time
 from timeit import default_timer as timer
 
+from pywinauto.findwindows import find_window
+
 import globals
 import utilities
 import pictures
@@ -21,7 +23,7 @@ import win32con
 import win32gui
 import os
 
-# Global variables
+# Champion variables
 list_of_champs = [pictures.ashe, pictures.annie]
 
 
@@ -74,23 +76,20 @@ def run():
             continue
 
         # Check for daily play rewards
-        if attempt_to_click_on(pictures.daily_play, None):
+        if attempt_to_click_on(pictures.daily_play, None, click=False):
             daily_play()
 
         # Check for level up rewards
         attempt_to_click_on(pictures.ok, None)
 
         # Check if we're in champ select
-        if attempt_to_click_on(pictures.edit_runes, None, click=False):
+        if attempt_to_click_on(pictures.choose_champ, None, click=False):
             champ_select()
-            while attempt_to_click_on(pictures.edit_runes, None, click=False):
-                time.sleep(1)
 
         # Check for other buttons
         attempt_to_click_on(pictures.play_button, None)
         attempt_to_click_on(pictures.party, None)
         attempt_to_click_on(pictures.coop_vs_ai, None)
-        attempt_to_click_on(pictures.find_match, None)
         attempt_to_click_on(pictures.intermediate_bots, None)
         attempt_to_click_on(pictures.confirm, None)
         attempt_to_click_on(pictures.find_match, None)
@@ -135,8 +134,8 @@ def complete_game():
         # Right click down mid every 1 second
         try:
             win32api.SetCursorPos((x, y))
-            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
-            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, x, y, 0, 0)
+            win32api.mouse_event(win32con.MOUSEEVENTF_MIDDLEDOWN, x, y, 0, 0)
+            win32api.mouse_event(win32con.MOUSEEVENTF_MIDDLEUP, x, y, 0, 0)
             time.sleep(1)
         except Exception:
             continue
@@ -164,6 +163,7 @@ def complete_game():
 def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.95):
     if not globals.go_flag:
         return False
+    focus_game_or_client()
     picture = os.path.join(globals.picture_path, picture)
     try:
         if is_game:
@@ -183,8 +183,10 @@ def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, cl
             if click:
                 pyautogui.click(coordinates[0], coordinates[1])
             globals.time_since_last_click = timer()
+            time.sleep(1)
             return True
     except Exception:
+        time.sleep(1)
         return False
 
 
@@ -276,6 +278,7 @@ def restart_client():
 
 
 def daily_play():
+    print("Claiming daily play rewards...")
     done = False
     while not done:
         if globals.stop_flag:
@@ -320,11 +323,10 @@ def increment_games():
 
 
 def focus_game_or_client():
-    pass
-    # if(IsLeagueInGame()):
-    #     SetForegroundWindow(find_window(title='League of Legends (TM) Client'))
-    # elif(IsClientOpen()):
-    #     SetForegroundWindow(find_window(title='League of Legends'))
+    if utilities.is_league_in_game():
+        win32gui.SetForegroundWindow(find_window(title='League of Legends (TM) Client'))
+    elif utilities.is_client_open():
+        win32gui.SetForegroundWindow(find_window(title='League of Legends'))
 
 
 def set_to_pause():
@@ -346,3 +348,5 @@ def quit_bot():
     listener.stop()
     globals.stop_flag = 1
     utilities.set_user_files()
+    while True:
+        time.sleep(1)

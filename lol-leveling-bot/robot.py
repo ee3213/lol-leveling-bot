@@ -3,6 +3,8 @@
 #            a player for intermediate bots, attack move on the enemy nexus until game  #
 #            ends, and then repeat.                                                     #
 
+# TODO: Find all locations where an exception would cause the bot to terminate, and add stop_bot() there
+
 import subprocess
 import time
 from timeit import default_timer as timer
@@ -22,6 +24,7 @@ import win32con
 import win32gui
 import os
 
+# TODO: Allow user input for champions to play
 # Champion variables
 list_of_champs = [pictures.ashe, pictures.annie]
 
@@ -141,6 +144,7 @@ def complete_game():
 def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.95):
     if not globals.go_flag:
         return False
+    # TODO: Test if the focus_game_or_client() function is working
     focus_game_or_client()
     picture = os.path.join(globals.picture_path, picture)
     try:

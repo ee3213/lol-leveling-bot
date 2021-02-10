@@ -11,6 +11,7 @@ import listener
 import globals
 
 
+# TODO: Find a way to make the program save user files even if shell is closed
 def exit_handler():
     utilities.set_user_files()
     print("Bot has terminated.")

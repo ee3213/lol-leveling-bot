@@ -348,5 +348,7 @@ def quit_bot():
     listener.stop()
     globals.stop_flag = 1
     utilities.set_user_files()
+    print("Bot has finished all games.")
+    print("Bot will now quit.")
     while True:
-        time.sleep(1)
+        time.sleep(3)

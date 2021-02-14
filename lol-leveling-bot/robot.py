@@ -63,6 +63,9 @@ def run():
         # Check for level up rewards
         attempt_to_click_on(pictures.ok, None)
 
+        # Check for clash notification
+        attempt_to_click_on(pictures.clash, None)
+
         # Check if we're in champ select
         if attempt_to_click_on(pictures.choose_champ, None, click=False):
             champ_select()
@@ -144,8 +147,6 @@ def complete_game():
 def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.95):
     if not globals.go_flag:
         return False
-    # TODO: Test if the focus_game_or_client() function is working
-    focus_game_or_client()
     picture = os.path.join(globals.picture_path, picture)
     try:
         if is_game:

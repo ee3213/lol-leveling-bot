@@ -7,6 +7,8 @@ import robot
 import utilities
 import listener
 import globals
+import pictures
+import regions
 
 # TODO: Find a way to make the program save user files even if shell is closed
 
@@ -30,4 +32,3 @@ if __name__ == '__main__':
 
     # Run bot
     robot.run()
-

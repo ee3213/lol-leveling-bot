@@ -32,9 +32,8 @@ list_of_champs = [pictures.ashe, pictures.annie]
 def run():
     utilities.set_status('Starting bot...')
 
-    # If league is in game, finish the game
+    # If league is already in game, finish the game
     if utilities.is_league_in_game():
-        focus_game_or_client()
         complete_game()
 
     # Otherwise, restart client and wait for login
@@ -43,9 +42,9 @@ def run():
         utilities.set_status('Awaiting login...')
         await_login()
 
-    # Start queueing up
-    globals.time_since_last_click = timer()
-    utilities.set_status('Queueing for a game...')
+        # Start queueing up
+        globals.time_since_last_click = timer()
+        utilities.set_status('Queueing for a game...')
 
     # Start loop
     while True:
@@ -100,14 +99,12 @@ def complete_game():
 
     # Click mid
     utilities.set_status('Running it down mid...')
-    game_flag = 1
-    while game_flag:
+    while True:
         pause_if_needed()
 
         # If we're out of game
         if not utilities.is_league_in_game():
-            game_flag = 0
-            continue
+            break
 
         # Get the location of league window
         try:
@@ -143,7 +140,7 @@ def complete_game():
         time.sleep(1)
 
     # Requeue for another game
-    utilities.set_status("Currently queueing for a game...")
+    utilities.set_status("Queueing for a game...")
 
 
 def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, click=True, conf=0.95):
@@ -168,6 +165,7 @@ def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, cl
             if click:
                 pyautogui.click(coordinates[0], coordinates[1])
             globals.time_since_last_click = timer()
+            time.sleep(1)
             return True
     except Exception:
         return False

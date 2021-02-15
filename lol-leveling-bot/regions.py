@@ -4,7 +4,7 @@ game_lockscreen_coords = (1068, 735)
 # Button Scanning regions
 play_button = (63, 21, 187, 59)
 party_button = (63, 21, 187, 59)
-coop_vs_ai = (90, 82, 203, 110)
+coop_vs_ai = (88, 79, 205, 117)
 intermediate_bots = (403, 540, 556, 565)
 confirm = (420, 663, 633, 710)
 find_match = (423, 662, 634, 708)

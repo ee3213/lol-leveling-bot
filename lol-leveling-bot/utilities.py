@@ -2,6 +2,8 @@ import shutil
 import os
 import win32gui
 from pywinauto.findwindows import find_window
+from timeit import default_timer as timer
+import robot
 
 import globals
 
@@ -107,3 +109,16 @@ def is_riot_client_open():
 def set_status(status):
     globals.last_status = status
     print(status)
+
+
+def test_speed(picture, region=None):
+    globals.picture_path = os.path.join(os.getcwd(), "search_images")
+    start = timer()
+    found = robot.attempt_to_click_on(picture, region)
+    end = timer()
+    if found:
+        print("Picture found!")
+    else:
+        print("Picture not found!")
+    print("Total time elapsed = %f" % (end - start))
+

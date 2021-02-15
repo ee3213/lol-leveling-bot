@@ -70,19 +70,18 @@ def run():
         attempt_to_click_on(pictures.ok_champ_select_bug, None)
 
         # Check if we're in champ select
-        if attempt_to_click_on(pictures.choose_champ, None, click=False):
+        if attempt_to_click_on(pictures.choose_champ, regions.choose_champ, click=False):
             champ_select()
 
         # Check for other buttons
-        attempt_to_click_on(pictures.play_button, None)
-        attempt_to_click_on(pictures.party, None)
-        attempt_to_click_on(pictures.coop_vs_ai, None)
-        attempt_to_click_on(pictures.intermediate_bots, None)
-        attempt_to_click_on(pictures.confirm, None)
-        attempt_to_click_on(pictures.find_match, None)
-        attempt_to_click_on(pictures.accept, None)
+        attempt_to_click_on(pictures.play_button, regions.play_button)
+        attempt_to_click_on(pictures.party, regions.party_button)
+        attempt_to_click_on(pictures.coop_vs_ai, regions.coop_vs_ai)
+        attempt_to_click_on(pictures.intermediate_bots, regions.intermediate_bots)
+        attempt_to_click_on(pictures.confirm, regions.confirm)
+        attempt_to_click_on(pictures.find_match, regions.find_match)
+        attempt_to_click_on(pictures.accept, regions.accept)
         attempt_to_click_on(pictures.play_again, None)
-        attempt_to_click_on(pictures.find_match, None)
 
         # If 2 minutes has elapsed without doing anything, restart client
         if did_timeout(120):
@@ -161,18 +160,16 @@ def attempt_to_click_on(picture, region, is_game=False, is_riot_client=False, cl
         if region is not None:
             start_x = rect[0] + region[0]
             start_y = rect[1] + region[1]
-            width = region[2]
-            height = region[3]
+            width = region[2] - region[0]
+            height = region[3] - region[1]
             rect = (start_x, start_y, width, height)
         coordinates = pyautogui.locateCenterOnScreen(picture, region=rect, confidence=conf)
         if coordinates is not None:
             if click:
                 pyautogui.click(coordinates[0], coordinates[1])
             globals.time_since_last_click = timer()
-            time.sleep(1)
             return True
     except Exception:
-        time.sleep(1)
         return False
 
 
@@ -184,11 +181,10 @@ def did_timeout(seconds):
 
 
 def champ_select():
-    utilities.set_status("In champion select...")
     for champion in list_of_champs:
-        if attempt_to_click_on(champion, None):
+        if attempt_to_click_on(champion, regions.champ_select):
             time.sleep(2)
-            if attempt_to_click_on(pictures.lockin, None):
+            if attempt_to_click_on(pictures.lockin, regions.lockin):
                 return True
             else:
                 return False
@@ -207,9 +203,9 @@ def client_stuck():
 def await_login():
     while True:
         pause_if_needed()
-        if attempt_to_click_on(pictures.play_button, None):
+        if attempt_to_click_on(pictures.play_button, regions.play_button):
             return
-        elif attempt_to_click_on(pictures.party, None):
+        elif attempt_to_click_on(pictures.party, regions.party_button):
             return
         elif attempt_to_click_on(pictures.daily_play, None):
             daily_play()
@@ -235,7 +231,7 @@ def lock_screen():
 def open_client():
     try:
         subprocess.Popen(globals.lol_client_path)
-    except Exception as e:
+    except Exception:
         print("Couldn't open league client")
         stop_bot()
 

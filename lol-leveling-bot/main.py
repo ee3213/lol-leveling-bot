@@ -3,24 +3,15 @@
 #            a player for intermediate bots, attack move on the enemy nexus until game  #
 #            ends, and then repeat.                                                     #
 
-import atexit
-
 import robot
 import utilities
 import listener
 import globals
 
-
 # TODO: Find a way to make the program save user files even if shell is closed
-def exit_handler():
-    utilities.set_user_files()
-    print("Bot has terminated.")
 
 
 if __name__ == '__main__':
-
-    atexit.register(exit_handler)
-
     # Ask the user how many games they want to play
     while True:
         try:

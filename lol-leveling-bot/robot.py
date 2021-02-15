@@ -66,6 +66,9 @@ def run():
         # Check for clash notification
         attempt_to_click_on(pictures.clash, None)
 
+        # Check if champ select bugged
+        attempt_to_click_on(pictures.ok_champ_select_bug, None)
+
         # Check if we're in champ select
         if attempt_to_click_on(pictures.choose_champ, None, click=False):
             champ_select()

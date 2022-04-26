@@ -47,9 +47,12 @@ def save_user_files():
         print("Successfully created %s" % user_settings_path)
     except FileExistsError:
         print("Folder %s already exists" % user_settings_path)
-    for files in globals.files_to_replace:
-        shutil.copy(os.path.join(lol_settings_path, files), os.path.join(user_settings_path, files))
-    print("Successfully saved user settings to %s" % user_settings_path)
+    try:
+        for files in globals.files_to_replace:
+            shutil.copy(os.path.join(lol_settings_path, files), os.path.join(user_settings_path, files))
+        print("Successfully saved user settings to %s" % user_settings_path)
+    except FileNotFoundError:
+        print("No user files on the machine to save.")
 
 
 def set_bot_files():

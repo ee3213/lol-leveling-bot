@@ -18,11 +18,11 @@ if __name__ == '__main__':
     while True:
         try:
             globals.number_of_games_to_play = int(input("How many games do you want to play? "))
-            if globals.number_of_games_to_play < 1 or globals.number_of_games_to_play > 100:
+            if globals.number_of_games_to_play < 1 or globals.number_of_games_to_play > 250:
                 raise ValueError
             break
         except ValueError:
-            print("Invalid integer. The number must be in the range of 1-100.")
+            print("Invalid integer. The number must be in the range of 1-250.")
 
     # Perform setup
     utilities.setup()

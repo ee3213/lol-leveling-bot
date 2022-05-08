@@ -21,13 +21,6 @@ def on_keyboard_event(event):
 
 
 def hook_keyboard():
-    # wait until the gui thread gets an input
-    while globals.number_of_games_to_play == -1:
-        time.sleep(0.1)
-    # if the user canceled input, then return
-    if globals.number_of_games_to_play is None:
-        return
-
     # save the id of the thread
     globals.listener_thread_id = threading.get_ident()
 

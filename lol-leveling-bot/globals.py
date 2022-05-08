@@ -2,7 +2,6 @@
 pause_key = "F6"
 
 # Numerical variables
-number_of_games_to_play = -1  # default to -1 to tell the robot and listener threads to wait
 number_of_games_finished = 0
 go_flag = 1
 stop_flag = 0

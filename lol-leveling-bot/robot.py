@@ -123,11 +123,6 @@ def complete_game():
     # Once the game is finished
     increment_games()
 
-    # Check to see if the bot is finished all games
-    if globals.number_of_games_finished == globals.number_of_games_to_play:
-        stop_bot()
-        return
-
     # Skip honor
     globals.time_since_last_click = timer()
     while not attempt_to_click_on(pictures.skip_honor, None):
@@ -205,6 +200,9 @@ def await_login():
             return
         elif attempt_to_click_on(pictures.daily_play, None):
             daily_play()
+            return
+        elif utilities.is_league_in_game():
+            complete_game()
             return
         elif attempt_to_click_on(pictures.riot_client_play, None, is_riot_client=True):
             pass
@@ -284,12 +282,7 @@ def move_windows():
 
 def increment_games():
     globals.number_of_games_finished = globals.number_of_games_finished + 1
-    if globals.number_of_games_finished == globals.number_of_games_to_play:
-        utilities.set_status("The bot successfully finished %d out of %d games!" %
-                             (globals.number_of_games_finished, globals.number_of_games_to_play))
-    else:
-        utilities.set_status("The bot finished %d out of %d games." %
-                             (globals.number_of_games_finished, globals.number_of_games_to_play))
+    utilities.set_status("The bot has finished %d games." % globals.number_of_games_finished)
 
 
 def focus_game_or_client():

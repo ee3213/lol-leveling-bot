@@ -69,6 +69,9 @@ def run():
             utilities.set_status("The account has reached level 30!")
             stop_bot()
 
+        # Check for key fragment popups
+        attempt_to_click_on(pictures.key_fragment, None)
+
         # Check for other buttons
         attempt_to_click_on(pictures.play_button, regions.play_button)
         attempt_to_click_on(pictures.party, regions.party_button)

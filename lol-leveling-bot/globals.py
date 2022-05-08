@@ -1,6 +1,3 @@
-#   @author: Mitchell Levesque                                                          #
-#   @desc  : A file containing all global variables for the program                     #
-
 # Setting variables
 pause_key = "F6"
 
@@ -23,12 +20,3 @@ files_to_replace = ['game.cfg', 'input.ini']
 listener_thread = None
 listener_thread_id = None
 bot_thread = None
-
-# GUI variables
-# last_status = None
-# status_label = None
-# games_played_label = None
-# games_left_label = None
-# pause_button = None
-# settings_pause_key = None
-# settings_num_games = None

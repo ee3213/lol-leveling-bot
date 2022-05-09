@@ -91,9 +91,7 @@ def set_status(status):
 def move_windows():
     try:
         hwnd = win32gui.FindWindow(None, 'LoL Bot')
-        win32gui.MoveWindow(hwnd, 0, 0, 640, 1080, True)
-        hwnd = win32gui.FindWindow(None, 'Console Window Host')
-        win32gui.MoveWindow(hwnd, 0, 0, 640, 1080, True)
+        win32gui.MoveWindow(hwnd, 0, 0, 640, 720, True)
         if is_client_open():
             hwnd = win32gui.FindWindow(None, 'League of Legends')
             win32gui.MoveWindow(hwnd, 640, 180, 1280, 720, True)

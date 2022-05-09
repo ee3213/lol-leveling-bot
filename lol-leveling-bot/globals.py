@@ -1,5 +1,6 @@
 # Setting variables
 pause_key = "F6"
+move_windows_key = "F7"
 
 # Numerical variables
 number_of_games_finished = 0

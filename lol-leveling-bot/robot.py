@@ -273,18 +273,6 @@ def daily_play():
     return
 
 
-def move_windows():
-    try:
-        if utilities.is_client_open():
-            hwnd = win32gui.FindWindow(None, 'League of Legends')
-            win32gui.MoveWindow(hwnd, 350, 180, 1280, 720, True)
-        if utilities.is_league_in_game():
-            hwnd = win32gui.FindWindow(None, 'League of Legends (TM) Client')
-            win32gui.MoveWindow(hwnd, 600, 180, 1280, 720, True)
-    except Exception:
-        return
-
-
 def increment_games():
     globals.number_of_games_finished = globals.number_of_games_finished + 1
     utilities.set_status("The bot has finished %d games." % globals.number_of_games_finished)

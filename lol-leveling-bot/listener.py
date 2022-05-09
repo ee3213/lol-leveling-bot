@@ -11,11 +11,14 @@ import time
 
 import globals
 import robot
+import utilities
 
 
 def on_keyboard_event(event):
     if event.Key == globals.pause_key:
         robot.set_to_pause()
+    elif event.Key == globals.move_windows_key:
+        utilities.move_windows()
     # return True to pass the event to other handlers
     return True
 

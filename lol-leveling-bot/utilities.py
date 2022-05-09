@@ -1,5 +1,8 @@
 import shutil
 import os
+
+import pyautogui
+import pywinauto.win32functions
 import win32gui
 from pywinauto.findwindows import find_window
 
@@ -96,8 +99,10 @@ def move_windows():
             hwnd = win32gui.FindWindow(None, 'League of Legends')
             win32gui.MoveWindow(hwnd, 640, 180, 1280, 720, True)
         if is_league_in_game():
-            hwnd = win32gui.FindWindow(None, 'League of Legends (TM) Client')
-            win32gui.MoveWindow(hwnd, 640, 180, 1282, 752, False)
+            window = pyautogui.getWindowsWithTitle('League of Legends (TM) Client')
+            window.move(640, 180)
+            # hwnd = win32gui.FindWindow(None, 'League of Legends (TM) Client')
+            # win32gui.MoveWindow(hwnd, 640, 180, 1282, 752, True)
     except Exception:
         return
 

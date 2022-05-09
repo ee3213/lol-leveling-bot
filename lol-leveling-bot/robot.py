@@ -90,7 +90,7 @@ def run():
 def complete_game():
     utilities.set_status('Waiting for game to start...')
 
-    # Wait until recall is visible, then we know we're in game
+    # Wait until lock screen button is visible, then we know we're in game
     while not attempt_to_click_on(pictures.lock_camera, None, is_game=True):
         pause_if_needed()
 
@@ -103,6 +103,8 @@ def complete_game():
         if not utilities.is_league_in_game():
             break
 
+        attempt_to_click_on(pictures.lock_camera, None, is_game=True)
+
         # Get the location of league window
         try:
             rect = utilities.get_game_coords()
@@ -111,12 +113,12 @@ def complete_game():
         x = rect[0] + 1260
         y = rect[1] + 592
 
-        # Right click down mid every 1 second
+        # Right click down mid every 3 seconds
         try:
             win32api.SetCursorPos((x, y))
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, x, y, 0, 0)
-            time.sleep(1)
+            time.sleep(3)
         except Exception:
             continue
 

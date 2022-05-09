@@ -91,7 +91,7 @@ def complete_game():
     utilities.set_status('Waiting for game to start...')
 
     # Wait until lock screen button is visible, then we know we're in game
-    while not attempt_to_click_on(pictures.lock_camera, None, is_game=True):
+    while not attempt_to_click_on(pictures.lock_camera, None, is_game=True, click=False):
         pause_if_needed()
 
     # Click mid
@@ -103,7 +103,9 @@ def complete_game():
         if not utilities.is_league_in_game():
             break
 
-        attempt_to_click_on(pictures.lock_camera, None, is_game=True)
+        # If the camera isn't locked, lock it
+        if attempt_to_click_on(pictures.lock_camera, None, is_game=True, click=False):
+            lock_screen()
 
         # Get the location of league window
         try:
@@ -117,7 +119,6 @@ def complete_game():
         try:
             win32api.SetCursorPos((x, y))
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
-            time.sleep(0.1)
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, x, y, 0, 0)
             time.sleep(3)
         except Exception:
@@ -211,18 +212,18 @@ def await_login():
             pass
 
 
-# def lock_screen():
-#     try:
-#         rect = utilities.get_game_coords()
-#         x, y = regions.game_lockscreen_coords
-#         x = rect[0] + x
-#         y = rect[1] + y
-#         win32api.SetCursorPos((x, y))
-#         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
-#         time.sleep(0.1)
-#         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
-#     except Exception:
-#         pass
+def lock_screen():
+    try:
+        rect = utilities.get_game_coords()
+        x, y = regions.game_lockscreen_coords
+        x = rect[0] + x
+        y = rect[1] + y
+        win32api.SetCursorPos((x, y))
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
+        time.sleep(0.1)
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
+    except Exception:
+        pass
 
 
 def open_client():

@@ -90,8 +90,8 @@ def run():
 def complete_game():
     utilities.set_status('Waiting for game to start...')
 
-    # Wait until lock screen button is visible, then we know we're in game
-    while not attempt_to_click_on(pictures.lock_camera, None, is_game=True, click=False):
+    # Wait until recall button is visible, then we know we're in game
+    while not attempt_to_click_on(pictures.recall, None, is_game=True, click=False):
         pause_if_needed()
 
     # Click mid
@@ -220,8 +220,9 @@ def lock_screen():
         y = rect[1] + y
         win32api.SetCursorPos((x, y))
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
-        time.sleep(0.5)
+        time.sleep(0.2)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
+        time.sleep(0.2)
     except Exception:
         pass
 

@@ -1,2 +1,5 @@
 /venv/
 /user_settings/
+/lol-leveling-bot/user_settings/input.ini
+/lol-leveling-bot/user_settings/game.cfg
+/lol-leveling-bot/test.py

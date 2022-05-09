@@ -278,13 +278,6 @@ def increment_games():
     utilities.set_status("The bot has finished %d games." % globals.number_of_games_finished)
 
 
-def focus_game_or_client():
-    if utilities.is_league_in_game():
-        win32gui.SetForegroundWindow(find_window(title='League of Legends (TM) Client'))
-    elif utilities.is_client_open():
-        win32gui.SetForegroundWindow(find_window(title='League of Legends'))
-
-
 def set_to_pause():
     if globals.go_flag == 0:
         globals.go_flag = 1

@@ -91,7 +91,7 @@ def set_status(status):
 def move_windows():
     try:
         hwnd = win32gui.FindWindow(None, 'LoL Bot')
-        win32gui.MoveWindow(hwnd, 0, 0, 640, 1080, True)
+        win32gui.MoveWindow(hwnd, -20, -20, 640, 1080, True)
         if is_client_open():
             hwnd = win32gui.FindWindow(None, 'League of Legends')
             win32gui.MoveWindow(hwnd, 640, 180, 1280, 720, True)
@@ -100,3 +100,11 @@ def move_windows():
             win32gui.MoveWindow(hwnd, 640, 180, 1280, 720, True)
     except Exception:
         return
+
+
+def focus_game_or_client():
+    if is_league_in_game():
+        win32gui.SetForegroundWindow(find_window(title='League of Legends (TM) Client'))
+    elif is_client_open():
+        win32gui.SetForegroundWindow(find_window(title='League of Legends'))
+

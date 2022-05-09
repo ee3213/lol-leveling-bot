@@ -117,6 +117,7 @@ def complete_game():
         try:
             win32api.SetCursorPos((x, y))
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
+            time.sleep(0.1)
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, x, y, 0, 0)
             time.sleep(3)
         except Exception:

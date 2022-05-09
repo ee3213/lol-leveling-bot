@@ -95,7 +95,7 @@ def move_windows():
         if is_client_open():
             hwnd = win32gui.FindWindow(None, 'League of Legends')
             win32gui.MoveWindow(hwnd, 640, 180, 1280, 720, True)
-        elif is_league_in_game():
+        if is_league_in_game():
             hwnd = win32gui.FindWindow(None, 'League of Legends (TM) Client')
             win32gui.MoveWindow(hwnd, 640, 180, 1282, 759, True)
     except Exception:

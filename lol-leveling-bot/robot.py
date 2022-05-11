@@ -81,6 +81,7 @@ def run():
         attempt_to_click_on(pictures.find_match, regions.find_match)
         attempt_to_click_on(pictures.accept, regions.accept)
         attempt_to_click_on(pictures.play_again, None)
+        attempt_to_click_on(pictures.continue_btn, None)
 
         # If 2 minutes has elapsed without doing anything, restart client
         if did_timeout(120):

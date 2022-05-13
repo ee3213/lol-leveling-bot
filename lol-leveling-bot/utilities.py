@@ -57,7 +57,7 @@ def get_game_coords():
 
 
 def get_riot_client_coords():
-    hwnd = win32gui.FindWindow(None, 'Riot Client')
+    hwnd = win32gui.FindWindow(None, 'Riot Client Main')
     rect = win32gui.GetWindowRect(hwnd)
     return rect
 

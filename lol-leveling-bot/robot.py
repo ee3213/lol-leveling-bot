@@ -38,6 +38,9 @@ def run():
         globals.time_since_last_click = timer()
         utilities.set_status('Queueing for a game...')
 
+    # Put the console on the left side of the screen
+    utilities.move_windows()
+
     # Start loop
     while True:
         pause_if_needed()
